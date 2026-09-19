@@ -43,11 +43,10 @@ typedef void (*ResponseCallback)(GomuksResponse response);
 
 // GomuksInit initializes a new gomuks instance and returns a handle.
 // The handle can't be used before GomuksStart is called nor after GomuksDestroy is called.
-// If root is non-NULL, it is used as the root directory for all gomuks data
-// (config, cache, data, logs), bypassing environment variable lookups.
-// Pass NULL to use the default directory resolution.
-// The caller is responsible for memory management of the root path string.
-GomuksHandle GomuksInit(char* root);
+// envVars is an optional JSON-encoded object of string key/value pairs (e.g. {"XDG_CONFIG_HOME":"/path"})
+// that will be set as environment variables before directory resolution runs.
+// Pass a buffer with length 0 (base may be NULL) to skip.
+GomuksHandle GomuksInit(GomuksBorrowedBuffer envVars);
 // GomuksStart starts the gomuks instance and Matrix sync loop.
 // If the return value is non-zero, the call failed and the handle isn't ready for use.
 // The callback will be called to provide the initial room list as well as any new events.

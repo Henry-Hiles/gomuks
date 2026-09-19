@@ -1,5 +1,6 @@
 .idea/
 target/
+.direnv/
 .tmp/
 /gomuks
 start

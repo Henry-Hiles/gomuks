@@ -118,14 +118,21 @@ func sendBufferedEvent[T any](callback C.EventCallback, command *jsoncmd.Contain
 }
 
 //export GomuksInit
-func GomuksInit(root *C.char) C.GomuksHandle {
+func GomuksInit(envVars C.GomuksBorrowedBuffer) C.GomuksHandle {
+	if envVars.length > 0 {
+		var parsed map[string]string
+		if err := json.Unmarshal(borrowBufferBytes(envVars), &parsed); err != nil {
+			panic(fmt.Errorf("failed to parse envVars: %w", err))
+		}
+		for k, v := range parsed {
+			os.Setenv(k, v)
+		}
+	}
+
 	gomuks.DisablePush = true
 	hicli.InitialDeviceDisplayName = "gomuks ffi" // TODO customizable name
 	gmx := gomuks.NewGomuks()
 	gmx.DisableAuth = true
-	if root != nil {
-		gmx.RootOverride = C.GoString(root)
-	}
 	gmx.InitDirectories()
 	gmx.Config = gomuks.Config{
 		Logging: zeroconfig.Config{
